@@ -1,6 +1,6 @@
 use glam::Vec3;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 
 pub struct Transform {
     pub translate: Vec3, // where the shape sits in the world
