@@ -1,0 +1,9 @@
+[package]
+name = "renderer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+glam = "0.33"
+# only the PNG encoder is needed, which keeps build times short
+image = { version = "0.25", default-features = false, features = ["png"] }
