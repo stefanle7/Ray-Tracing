@@ -55,4 +55,14 @@ impl Scene {
         // return closest_hit
         closest_hit
     }
+
+    // implementing shadows to the image
+    pub fn shadow_hit(&self, ray: &Ray, t_min: f32, t_max: f32) -> bool {
+        for shape in &self.shapes {
+            if let Some(hit) = shape.hit(ray.origin(), ray.direction(), t_min, t_max) {
+                return true;
+            }
+        }
+        false
+    }
 }

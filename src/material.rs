@@ -3,6 +3,10 @@ use crate::ray::Ray;
 use crate::scene::Scene;
 use crate::shape::Hit;
 
+// small start offset for shadow rays so a surface doesn't shadow itself
+// ("shadow acne", lecture 9 slide 7)
+const SHADOW_EPS: f32 = 1e-3;
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Material {
     pub diffuse: Color, // diffuse color: the surface color
@@ -35,7 +39,16 @@ pub fn shade_pixel(hit: &Hit, ray: &Ray, scene: &Scene) -> Color {
 
     // step 5: for each light
     for light in &scene.lights {
-        let l = (light.position - p).normalize(); // compute l, unit vector from p toward light
+        let to_light = light.position - p; // from p to the light
+        let t_light = to_light.length(); // distance to the light
+        let l = to_light / t_light; // compute l, unit vector from p toward light
+
+        // shadow test (lecture 9 slides 10 and 14)
+        let shadow_ray = Ray::new(p, l);
+        if scene.shadow_hit(&shadow_ray, SHADOW_EPS, t_light) {
+            continue; // in shadow: this light adds nothing (ambient still applies)
+        }
+
         let h = (v + l).normalize(); // compute h = normalize(v + l)
         color += m.diffuse * light.intensity * n.dot(l).max(0.0); // add diffuse term
         color += m.specular * light.intensity * n.dot(h).max(0.0).powf(m.p); // add specular term
